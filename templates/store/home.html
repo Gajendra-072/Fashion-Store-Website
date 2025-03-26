@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load store_tags %}
+
+{% block title %}Welcome to Fashion Store{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'store:home' %}">
+            <i class="fas fa-tshirt me-2"></i>Fashion Store
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#categories">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#featured">Featured</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#men">Men's Collection</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'store:cart' %}" class="btn btn-outline-dark position-relative me-3">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if cart_count %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ cart_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-dark dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>{{ user.username }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'store:profile' %}">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'store:logout' %}">Logout</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{% url 'store:login' %}" class="btn btn-outline-dark me-2">Login</a>
+                    <a href="{% url 'store:register' %}" class="btn btn-dark">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section mb-5" style="margin-top: 76px;">
+    <div class="container-fluid px-0">
+        <div class="position-relative">
+            <img src="{{ hero_image }}" alt="Fashion Store Hero" class="w-100" style="height: 600px; object-fit: cover;">
+            <div class="position-absolute top-50 start-50 translate-middle text-center text-white">
+                <h1 class="display-4 fw-bold mb-4" data-aos="fade-up">Discover Your Style</h1>
+                <a href="{% url 'store:product_list' %}" class="btn btn-light btn-lg" data-aos="fade-up" data-aos-delay="200">
+                    Shop Now
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section id="categories" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5" data-aos="fade-up">Shop by Category</h2>
+        <div class="row g-4">
+            {% for image in category_images %}
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="{{ forloop.counter|multiply:100 }}">
+                <div class="card category-card border-0 shadow-sm h-100">
+                    <img src="{{ image }}" class="card-img-top" alt="Category" style="height: 250px; object-fit: cover;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ forloop.counter|category_name }}</h5>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-outline-dark">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section id="featured" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5" data-aos="fade-up">Featured Products</h2>
+        <div class="row g-4">
+            {% for product in featured_products %}
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="{{ forloop.counter|multiply:100 }}">
+                <div class="card product-card border-0 shadow-sm h-100">
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 300px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted">₹{{ product.price }}</p>
+                        <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-outline-dark w-100">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Men's Collection -->
+<section id="men" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5" data-aos="fade-up">Men's Collection</h2>
+        <div class="row g-4">
+            {% for image in men_images %}
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|multiply:100 }}">
+                <div class="card border-0 shadow-sm h-100">
+                    <img src="{{ image }}" class="card-img-top" alt="Men's Collection" style="height: 400px; object-fit: cover;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ forloop.counter|men_category }}</h5>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-outline-dark">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .navbar {
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.9) !important;
+    }
+    .card {
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .hero-section {
+        position: relative;
+        background-color: #000;
+    }
+    .hero-section img {
+        opacity: 0.7;
+    }
+    .category-card .card-img-top,
+    .product-card .card-img-top {
+        transition: transform 0.3s ease;
+    }
+    .category-card:hover .card-img-top,
+    .product-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+    .btn-outline-dark:hover {
+        background-color: #2c3e50;
+        border-color: #2c3e50;
+    }
+</style>
+
+{% endblock %} 

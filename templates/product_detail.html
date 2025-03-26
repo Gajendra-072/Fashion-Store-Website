@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Fashion Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Product Images -->
+        <div class="col-lg-6 mb-4">
+            <div class="product-gallery">
+                <div class="main-image mb-3">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded-3">
+                </div>
+                {% if product.additional_images.all %}
+                <div class="thumbnails d-flex gap-2">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="thumbnail active">
+                    {% for image in product.additional_images.all %}
+                    <img src="{{ image.image.url }}" alt="{{ product.name }}" class="thumbnail">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'store:category_detail' product.category.slug %}">{{ product.category.name }}</a></li>
+                    <li class="breadcrumb-item active">{{ product.name }}</li>
+                </ol>
+            </nav>
+
+            <h1 class="product-title mb-3">{{ product.name }}</h1>
+            <div class="d-flex align-items-center mb-3">
+                <div class="rating me-3">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="far fa-star text-warning"></i>
+                </div>
+                <span class="text-muted">(4.0 / 5.0)</span>
+            </div>
+
+            <div class="price-section mb-4">
+                {% if product.sale_price %}
+                <span class="text-decoration-line-through text-muted h4">{{ product.price }}</span>
+                <span class="text-danger h3 ms-2">{{ product.sale_price }}</span>
+                <span class="badge bg-danger ms-2">-{{ product.discount_percentage }}%</span>
+                {% else %}
+                <span class="h3">{{ product.price }}</span>
+                {% endif %}
+            </div>
+
+            <div class="product-description mb-4">
+                <h5>Description</h5>
+                <p>{{ product.description }}</p>
+            </div>
+
+            <div class="product-options mb-4">
+                <!-- Size Selection -->
+                <div class="mb-3">
+                    <h5>Select Size</h5>
+                    <div class="d-flex gap-2">
+                        {% for size in product.sizes.all %}
+                        <button class="btn btn-outline-primary size-button" data-size="{{ size.name }}">
+                            {{ size.name }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Color Selection -->
+                <div class="mb-3">
+                    <h5>Select Color</h5>
+                    <div class="d-flex gap-2">
+                        {% for color in product.colors.all %}
+                        <button class="btn color-button" style="background-color: {{ color.code }}; width: 40px; height: 40px; border-radius: 50%;" data-color="{{ color.name }}"></button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Quantity -->
+                <div class="mb-4">
+                    <h5>Quantity</h5>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-outline-primary minus-btn">-</button>
+                        <input type="number" class="form-control text-center quantity-input mx-2" value="1" min="1" max="{{ product.stock }}">
+                        <button class="btn btn-outline-primary plus-btn">+</button>
+                    </div>
+                </div>
+
+                <!-- Add to Cart -->
+                <button class="btn btn-primary btn-lg w-100 add-to-cart-btn mb-3" data-product-id="{{ product.id }}">
+                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                </button>
+
+                <!-- Wishlist -->
+                <button class="btn btn-outline-primary w-100">
+                    <i class="far fa-heart me-2"></i>Add to Wishlist
+                </button>
+            </div>
+
+            <div class="product-meta">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Brand:</span>
+                    <span>{{ product.brand.name }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Category:</span>
+                    <span>{{ product.category.name }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Gender:</span>
+                    <span>{{ product.get_gender_display }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Stock:</span>
+                    <span class="{% if product.stock > 0 %}text-success{% else %}text-danger{% endif %}">
+                        {% if product.stock > 0 %}In Stock{% else %}Out of Stock{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Tabs -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="description-tab" data-bs-toggle="tab" href="#description" role="tab">
+                        Description
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="specifications-tab" data-bs-toggle="tab" href="#specifications" role="tab">
+                        Specifications
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab">
+                        Reviews
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content py-4" id="productTabContent">
+                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Product Details</h5>
+                            <p>{{ product.description }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Care Instructions</h5>
+                            <ul>
+                                <li>Machine wash cold</li>
+                                <li>Do not bleach</li>
+                                <li>Tumble dry low</li>
+                                <li>Iron on medium heat</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="specifications" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Material</h5>
+                            <p>100% Cotton</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Origin</h5>
+                            <p>Made in Bangladesh</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h2 class="mb-0">4.0</h2>
+                                <div class="rating mb-2">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="far fa-star text-warning"></i>
+                                </div>
+                                <p class="text-muted">Based on 128 reviews</p>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="review-list">
+                                <!-- Sample Review -->
+                                <div class="review-item mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <h6>John Doe</h6>
+                                        <small class="text-muted">2 days ago</small>
+                                    </div>
+                                    <div class="rating mb-2">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                    <p>Great product! The quality is excellent and it fits perfectly.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="section-title mb-4">Related Products</h2>
+            <div class="row g-4">
+                {% for product in related_products %}
+                <div class="col-md-3">
+                    <div class="product-card card h-100">
+                        <div class="position-relative">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top product-image">
+                            <div class="product-overlay">
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-light">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button class="btn btn-light add-to-cart-btn" data-product-id="{{ product.id }}">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-muted">{{ product.brand.name }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price">{{ product.price }}</span>
+                                <div class="rating">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="far fa-star text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

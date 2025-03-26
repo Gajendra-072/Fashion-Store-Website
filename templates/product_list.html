@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products - Fashion Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">All Products</h1>
+        <div class="d-flex gap-2">
+            <select class="form-select" id="sortSelect">
+                <option value="featured">Featured</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Filters</h5>
+                    
+                    <!-- Categories -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Categories</h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="menClothing">
+                            <label class="form-check-label" for="menClothing">Men's Clothing</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="womenClothing">
+                            <label class="form-check-label" for="womenClothing">Women's Clothing</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="shoes">
+                            <label class="form-check-label" for="shoes">Shoes</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="accessories">
+                            <label class="form-check-label" for="accessories">Accessories</label>
+                        </div>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Price Range</h6>
+                        <div class="d-flex gap-2">
+                            <input type="number" class="form-control" placeholder="Min">
+                            <input type="number" class="form-control" placeholder="Max">
+                        </div>
+                    </div>
+
+                    <!-- Colors -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Colors</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn color-button" style="background-color: #000000; width: 30px; height: 30px; border-radius: 50%;"></button>
+                            <button class="btn color-button" style="background-color: #FFFFFF; width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dee2e6;"></button>
+                            <button class="btn color-button" style="background-color: #FF0000; width: 30px; height: 30px; border-radius: 50%;"></button>
+                            <button class="btn color-button" style="background-color: #0000FF; width: 30px; height: 30px; border-radius: 50%;"></button>
+                            <button class="btn color-button" style="background-color: #00FF00; width: 30px; height: 30px; border-radius: 50%;"></button>
+                        </div>
+                    </div>
+
+                    <!-- Sizes -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Sizes</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary btn-sm">XS</button>
+                            <button class="btn btn-outline-primary btn-sm">S</button>
+                            <button class="btn btn-outline-primary btn-sm">M</button>
+                            <button class="btn btn-outline-primary btn-sm">L</button>
+                            <button class="btn btn-outline-primary btn-sm">XL</button>
+                            <button class="btn btn-outline-primary btn-sm">XXL</button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary w-100">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="col-md-9">
+            <div class="row g-4">
+                {% for product in products %}
+                <div class="col-md-4">
+                    <div class="product-card card h-100">
+                        <div class="position-relative">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top product-image">
+                            {% if product.sale_price %}
+                            <div class="sale-badge position-absolute top-0 end-0 m-2">
+                                -{{ product.discount_percentage }}%
+                            </div>
+                            {% endif %}
+                            <div class="product-overlay">
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-light">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button class="btn btn-light add-to-cart-btn" data-product-id="{{ product.id }}">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-muted">{{ product.brand.name }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="price">
+                                    {% if product.sale_price %}
+                                    <span class="text-decoration-line-through text-muted">{{ product.price }}</span>
+                                    <span class="text-danger ms-2">{{ product.sale_price }}</span>
+                                    {% else %}
+                                    <span>{{ product.price }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="rating">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="far fa-star text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h3>No products found</h3>
+                        <p class="text-muted">Try adjusting your search or filter criteria</p>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-primary">Clear Filters</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if products.has_other_pages %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in products.paginator.page_range %}
+                    <li class="page-item {% if products.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 
